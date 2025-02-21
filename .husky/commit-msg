@@ -1,1 +1,1 @@
-exec < /dev/tty && npx cz --hook || true
+echo "npx --no -- commitlint --edit \$1"
