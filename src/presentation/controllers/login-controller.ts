@@ -1,5 +1,5 @@
 import { MissingParamError } from '../errors';
-import { badRequest } from '../helpers';
+import { badRequest, serverError } from '../helpers';
 import type { Controller, HttpRequest, HttpResponse } from '../protocols/';
 
 export class LoginController implements Controller {
@@ -9,9 +9,16 @@ export class LoginController implements Controller {
   };
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-    const { email } = httpRequest.body;
+    const { email, password } = httpRequest.body;
     if (!email) {
       this.response = badRequest(new MissingParamError('email'));
+    }
+    if (!password) {
+      this.response = badRequest(new MissingParamError('password'));
+    }
+
+    if (!httpRequest.body) {
+      this.response = serverError();
     }
     return this.response;
   }
