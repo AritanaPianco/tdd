@@ -11,7 +11,8 @@
     "lint:fix": "biome check ./src --fix",
     "prepare": "husky",
     "commit": "cz",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
     "coverage": "vitest run --coverage"
   },
   "keywords": [],
