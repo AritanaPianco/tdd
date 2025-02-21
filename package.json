@@ -2,6 +2,7 @@
   "name": "tdd",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsup",
     "dev": "tsx watch src/server/server.ts",
@@ -9,7 +10,9 @@
     "lint": "biome check ./src",
     "lint:fix": "biome check ./src --fix",
     "prepare": "husky",
-    "commit": "cz"
+    "commit": "cz",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -20,17 +23,23 @@
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@types/node": "^22.13.4",
+    "@vitest/coverage-v8": "^3.0.6",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
     "tsup": "^8.3.6",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.6"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
   }
 }
