@@ -25,4 +25,11 @@ describe('Login Router', () => {
     expect(httpResponse).toEqual(badRequest(new MissingParamError('password')));
     expect(httpResponse.statusCode).toBe(400);
   });
+  test('should return 500 if httpRequest has no body', async () => {
+    const sut = new LoginController();
+    const httpRequest = {};
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(serverError());
+    expect(httpResponse.statusCode).toBe(500);
+  });
 });
