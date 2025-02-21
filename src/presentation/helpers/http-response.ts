@@ -1,5 +1,5 @@
 import { ServerError, UnauthorizedError } from '../errors';
-import type { HttpResponse } from '../protocols/http-response';
+import type { HttpResponse } from '../protocols/';
 
 export const badRequest = (error: Error): HttpResponse => {
   return {

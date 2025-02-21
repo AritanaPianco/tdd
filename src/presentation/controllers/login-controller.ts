@@ -1,8 +1,6 @@
 import { MissingParamError } from '../errors';
 import { badRequest } from '../helpers';
-import type { Controller } from '../protocols/controller';
-import type { HttpRequest } from '../protocols/http-request';
-import type { HttpResponse } from '../protocols/http-response';
+import type { Controller, HttpRequest, HttpResponse } from '../protocols/';
 
 export class LoginController implements Controller {
   private response: HttpResponse = {
