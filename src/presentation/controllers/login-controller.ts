@@ -9,17 +9,21 @@ export class LoginController implements Controller {
   };
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-    const { email, password } = httpRequest.body;
-    if (!email) {
-      this.response = badRequest(new MissingParamError('email'));
-    }
-    if (!password) {
-      this.response = badRequest(new MissingParamError('password'));
-    }
+    try {
+      const { email, password } = httpRequest.body;
+      if (!email) {
+        this.response = badRequest(new MissingParamError('email'));
+      }
+      if (!password) {
+        this.response = badRequest(new MissingParamError('password'));
+      }
 
-    if (!httpRequest.body) {
-      this.response = serverError();
+      if (!httpRequest.body) {
+        this.response = serverError();
+      }
+      return this.response;
+    } catch (error) {
+      return serverError();
     }
-    return this.response;
   }
 }
