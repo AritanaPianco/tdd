@@ -1,5 +1,0 @@
-{
-    "*.ts": [
-        "biome check ./src --fix"
-    ]
-}
