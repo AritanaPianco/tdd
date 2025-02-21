@@ -1,0 +1,3 @@
+echo "\033[93m[PRE-COMMIT] Verificando erros de formatação\033[0m"
+npm run lint
+
