@@ -1,10 +1,11 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
+import { MissingParamError } from '@/utils/errors';
 
 const makeSut = (): AuthUseCase => {
   class AuthUseCaseStub implements AuthUseCase {
     async execute(authModel: AuthModel): Promise<string | null> {
       if (!authModel.email || !authModel.password) {
-        throw new Error();
+        throw new MissingParamError('any_field');
       }
 
       return new Promise((resolve) => resolve('any_token'));
@@ -20,7 +21,7 @@ describe('Auth UseCase', () => {
       password: 'any_password',
     };
     const promise = sut.execute(authModel as AuthModel);
-    await expect(promise).rejects.toThrow();
+    await expect(promise).rejects.toThrow(new MissingParamError('any_field'));
   });
   test('should throw if no password is provided', async () => {
     const sut = makeSut();
@@ -28,6 +29,6 @@ describe('Auth UseCase', () => {
       email: 'any_email@mail.com',
     };
     const promise = sut.execute(authModel as AuthModel);
-    await expect(promise).rejects.toThrow();
+    await expect(promise).rejects.toThrow(new MissingParamError('any_field'));
   });
 });
