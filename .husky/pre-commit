@@ -1,5 +1,8 @@
 echo "\033[93m[PRE-COMMIT] Verificando erros de formatação e corrigindo\033[0m"
 npm run lint
 
+echo "\033[93m[PRE-COMMIT] Verificando erros de compilação\033[0m"
+pnpm run build
+
 echo "\033[93m[PRE-COMMIT] Rodando os testes unitários\033[0m"
 npm run test
