@@ -3,11 +3,21 @@ import { MissingParamError } from '../errors';
 import { badRequest, serverError } from '../helpers/';
 import { LoginController } from './login-controller';
 
+const makeAuthUseCase = (): AuthUseCase => {
+  class AuthUseCaseStub implements AuthUseCase {
+    async execute(authModel: AuthModel): Promise<string> {
+      return new Promise((resolve) => resolve('any_token'));
+    }
+  }
+  return new AuthUseCaseStub();
+};
+
 interface SutTypes {
   sut: LoginController;
 }
 
 const makeSut = (): SutTypes => {
+  const authUseCaseStub = makeAuthUseCase();
   const sut = new LoginController();
   return {
     sut,
