@@ -12,8 +12,12 @@ export class AuthenticationUseCae implements AuthUseCase {
       throw new MissingParamError('any_field');
     }
 
-    await this.loadUserByEmailRepository.loadByEmail(authModel.email);
-
+    const user = await this.loadUserByEmailRepository.loadByEmail(
+      authModel.email,
+    );
+    if (!user) {
+      return null;
+    }
     return new Promise((resolve) => resolve('any_token'));
   }
 }
