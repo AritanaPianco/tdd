@@ -95,7 +95,8 @@ describe('Login Router', () => {
     expect(httpResponse).toEqual(unauthorizedError());
   });
   test('should return 500 if no AuthUseCase is provived', async () => {
-    const sut = new LoginController({} as AuthUseCase, {} as EmailValidator);
+    const emailValidator = makeEmailValidator();
+    const sut = new LoginController({} as AuthUseCase, emailValidator);
     const httpRequest = {
       body: {
         email: 'any_email@gmail.com',
@@ -118,5 +119,19 @@ describe('Login Router', () => {
     const httpResponse = await sut.handle(httpRequest);
     expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')));
     expect(httpResponse.statusCode).toBe(400);
+  });
+  test('should return 500 if no EmailValidator is provived', async () => {
+    const authUseCase = makeAuthUseCase();
+    const sut = new LoginController(authUseCase, {} as EmailValidator);
+    const httpRequest = {
+      body: {
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+      },
+    };
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse.statusCode).toBe(500);
+    expect(httpResponse.body).toEqual(new ServerError());
+    expect(httpResponse).toEqual(serverError());
   });
 });
