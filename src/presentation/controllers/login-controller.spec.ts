@@ -1,6 +1,6 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '../errors';
-import { badRequest, serverError } from '../helpers/';
+import { badRequest, serverError, unauthorizedError } from '../helpers/';
 import { LoginController } from './login-controller';
 
 const makeAuthUseCase = (): AuthUseCase => {
@@ -14,19 +14,21 @@ const makeAuthUseCase = (): AuthUseCase => {
 
 interface SutTypes {
   sut: LoginController;
+  authUseCaseStub: AuthUseCase;
 }
 
 const makeSut = (): SutTypes => {
   const authUseCaseStub = makeAuthUseCase();
-  const sut = new LoginController();
+  const sut = new LoginController(authUseCaseStub);
   return {
     sut,
+    authUseCaseStub,
   };
 };
 
 describe('Login Router', () => {
   test('should return 400  if no email is provided', async () => {
-    const sut = new LoginController();
+    const { sut } = makeSut();
     const httpRequest = {
       body: {
         password: 'any_passowrd',
@@ -37,7 +39,7 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(400);
   });
   test('should return 400  if no password is provided', async () => {
-    const sut = new LoginController();
+    const { sut } = makeSut();
     const httpRequest = {
       body: {
         email: 'any_email',
@@ -48,10 +50,35 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(400);
   });
   test('should return 500 if httpRequest has no body', async () => {
-    const sut = new LoginController();
+    const { sut } = makeSut();
     const httpRequest = {};
     const httpResponse = await sut.handle(httpRequest);
     expect(httpResponse).toEqual(serverError());
     expect(httpResponse.statusCode).toBe(500);
+  });
+  test('should call AuthUseCase with corrects values', async () => {
+    const { sut, authUseCaseStub } = makeSut();
+    const executeSpy = vi.spyOn(authUseCaseStub, 'execute');
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+        password: 'any_password',
+      },
+    };
+    await sut.handle(httpRequest);
+    expect(executeSpy).toHaveBeenCalledWith(httpRequest.body);
+  });
+  test('should return 401 when invalid credentials are provided', async () => {
+    const { sut, authUseCaseStub } = makeSut();
+    vi.spyOn(authUseCaseStub, 'execute').mockReturnValueOnce(null!);
+    const httpRequest = {
+      body: {
+        email: 'invalid_email',
+        password: 'invalid_password',
+      },
+    };
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse.statusCode).toBe(401);
+    expect(httpResponse).toEqual(unauthorizedError());
   });
 });
