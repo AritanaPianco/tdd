@@ -1,5 +1,6 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { InvalidParamError, MissingParamError, ServerError } from '../errors';
+import { InvalidParamError, MissingParamError } from '@/utils/errors';
+import { ServerError } from '../errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers/';
 import type { HttpRequest, Validator } from '../protocols';
 import { LoginController } from './login-controller';

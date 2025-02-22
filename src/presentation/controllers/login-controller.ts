@@ -1,5 +1,5 @@
 import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { InvalidParamError, MissingParamError } from '../errors';
+import { InvalidParamError, MissingParamError } from '@/utils/errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers';
 import type {
   Controller,
