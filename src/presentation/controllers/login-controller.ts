@@ -1,5 +1,6 @@
+import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '../errors';
-import { badRequest, serverError } from '../helpers';
+import { badRequest, serverError, unauthorizedError } from '../helpers';
 import type { Controller, HttpRequest, HttpResponse } from '../protocols/';
 
 export class LoginController implements Controller {
@@ -7,6 +8,8 @@ export class LoginController implements Controller {
     statusCode: 0,
     body: '',
   };
+
+  constructor(private readonly authUseCase: AuthUseCase) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -18,9 +21,11 @@ export class LoginController implements Controller {
         this.response = badRequest(new MissingParamError('password'));
       }
 
-      if (!httpRequest.body) {
-        this.response = serverError();
+      const token = await this.authUseCase.execute(httpRequest.body);
+      if (!token) {
+        return unauthorizedError();
       }
+
       return this.response;
     } catch (error) {
       return serverError();
