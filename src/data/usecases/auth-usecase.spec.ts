@@ -1,17 +1,9 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
+import { AuthenticationUseCae } from './authentication-usecase';
 
 const makeSut = (): AuthUseCase => {
-  class AuthUseCaseStub implements AuthUseCase {
-    async execute(authModel: AuthModel): Promise<string | null> {
-      if (!authModel.email || !authModel.password) {
-        throw new MissingParamError('any_field');
-      }
-
-      return new Promise((resolve) => resolve('any_token'));
-    }
-  }
-  return new AuthUseCaseStub();
+  return new AuthenticationUseCae();
 };
 
 describe('Auth UseCase', () => {
