@@ -9,7 +9,12 @@ import { AuthenticationUseCae } from './authentication-usecase';
 const makeLoadUserByEmailRepository = (): LoadUserByEmailRepository => {
   class LoadUserByEmailRepositoryStub implements LoadUserByEmailRepository {
     async loadByEmail(email: string): Promise<User | null> {
-      return new Promise((resolve) => resolve(null));
+      const user: User = {
+        id: 'any_id',
+        email: 'any_email@mail.com',
+        password: 'any_password',
+      };
+      return new Promise((resolve) => resolve(user));
     }
   }
   return new LoadUserByEmailRepositoryStub();
@@ -55,5 +60,17 @@ describe('Auth UseCase', () => {
     const loadByEmailSpy = vi.spyOn(loadUserByEmailRepository, 'loadByEmail');
     const token = await sut.execute(authModel);
     expect(loadByEmailSpy).toHaveBeenCalledWith(authModel.email);
+  });
+  test('should return null if LoadUserByEmailRepository returns null', async () => {
+    const { sut, loadUserByEmailRepository } = makeSut();
+    const authModel = {
+      email: 'invalid_email@mail.com',
+      password: 'any_password',
+    };
+    vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
+      null!,
+    );
+    const token = await sut.execute(authModel);
+    expect(token).toBeNull();
   });
 });
