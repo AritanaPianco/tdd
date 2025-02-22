@@ -11,10 +11,10 @@ const makeLoadUserByEmailRepository = (): LoadUserByEmailRepository => {
     async loadByEmail(email: string): Promise<User | null> {
       const user: User = {
         id: 'any_id',
-        email: 'any_email@mail.com',
-        password: 'any_password',
+        email: 'valid_email@mail.com',
+        password: 'valid_password',
       };
-      return new Promise((resolve) => resolve(user));
+      return user;
     }
   }
   return new LoadUserByEmailRepositoryStub();
@@ -66,6 +66,30 @@ describe('Auth UseCase', () => {
     const authModel = {
       email: 'invalid_email@mail.com',
       password: 'any_password',
+    };
+    vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
+      null!,
+    );
+    const token = await sut.execute(authModel);
+    expect(token).toBeNull();
+  });
+  test('should return null if an invalid email is provided', async () => {
+    const { sut, loadUserByEmailRepository } = makeSut();
+    const authModel = {
+      email: 'invalid_email@mail.com',
+      password: 'any_password',
+    };
+    vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
+      null!,
+    );
+    const token = await sut.execute(authModel);
+    expect(token).toBeNull();
+  });
+  test('should return null if an invalid password is provided', async () => {
+    const { sut, loadUserByEmailRepository } = makeSut();
+    const authModel = {
+      email: 'valid_email@mail.com',
+      password: 'invalid_password',
     };
     vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
       null!,
