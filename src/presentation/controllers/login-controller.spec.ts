@@ -114,6 +114,7 @@ describe('Login Router', () => {
     const httpRequest = {
       body: {
         email: 'invalid_email',
+        password: 'any_password',
       },
     };
     const httpResponse = await sut.handle(httpRequest);
@@ -149,5 +150,16 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
+  });
+  test('should call EmailValidator with correct email', async () => {
+    const { sut, emailValidatorStub } = makeSut();
+    const isValidSpy = vi.spyOn(emailValidatorStub, 'isValid');
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+      },
+    };
+    await sut.handle(httpRequest);
+    expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email);
   });
 });
