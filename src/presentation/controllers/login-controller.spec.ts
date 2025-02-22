@@ -1,6 +1,6 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError, ServerError } from '../errors';
-import { badRequest, serverError, unauthorizedError } from '../helpers/';
+import { badRequest, ok, serverError, unauthorizedError } from '../helpers/';
 import type { EmailValidator } from '../protocols';
 import { LoginController } from './login-controller';
 
@@ -157,9 +157,22 @@ describe('Login Router', () => {
     const httpRequest = {
       body: {
         email: 'any_email',
+        password: 'any_password',
       },
     };
     await sut.handle(httpRequest);
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email);
+  });
+  test('should return 200 when valid credentials is provided', async () => {
+    const { sut } = makeSut();
+    const httpRequest = {
+      body: {
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+      },
+    };
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse).toEqual(ok('any_token'));
   });
 });

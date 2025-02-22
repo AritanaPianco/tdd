@@ -1,6 +1,6 @@
 import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError } from '../errors';
-import { badRequest, serverError, unauthorizedError } from '../helpers';
+import { badRequest, ok, serverError, unauthorizedError } from '../helpers';
 import type {
   Controller,
   EmailValidator,
@@ -23,10 +23,10 @@ export class LoginController implements Controller {
     try {
       const { email, password } = httpRequest.body;
       if (!email) {
-        this.response = badRequest(new MissingParamError('email'));
+        return badRequest(new MissingParamError('email'));
       }
       if (!password) {
-        this.response = badRequest(new MissingParamError('password'));
+        return badRequest(new MissingParamError('password'));
       }
 
       const valid = this.emailValidator.isValid(email);
@@ -39,7 +39,7 @@ export class LoginController implements Controller {
         return unauthorizedError();
       }
 
-      return this.response;
+      return ok(token);
     } catch (error) {
       return serverError();
     }
