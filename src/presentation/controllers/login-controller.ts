@@ -1,7 +1,12 @@
 import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { MissingParamError } from '../errors';
+import { InvalidParamError, MissingParamError } from '../errors';
 import { badRequest, serverError, unauthorizedError } from '../helpers';
-import type { Controller, HttpRequest, HttpResponse } from '../protocols/';
+import type {
+  Controller,
+  EmailValidator,
+  HttpRequest,
+  HttpResponse,
+} from '../protocols/';
 
 export class LoginController implements Controller {
   private response: HttpResponse = {
@@ -9,7 +14,10 @@ export class LoginController implements Controller {
     body: '',
   };
 
-  constructor(private readonly authUseCase: AuthUseCase) {}
+  constructor(
+    private readonly authUseCase: AuthUseCase,
+    private readonly emailValidator: EmailValidator,
+  ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -19,6 +27,11 @@ export class LoginController implements Controller {
       }
       if (!password) {
         this.response = badRequest(new MissingParamError('password'));
+      }
+
+      const valid = this.emailValidator.isValid(email);
+      if (!valid) {
+        return badRequest(new InvalidParamError('email'));
       }
 
       const token = await this.authUseCase.execute(httpRequest.body);
