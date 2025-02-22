@@ -1,7 +1,7 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError, ServerError } from '../errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers/';
-import type { EmailValidator, HttpRequest } from '../protocols';
+import type { HttpRequest, Validator } from '../protocols';
 import { LoginController } from './login-controller';
 
 const makeAuthUseCase = (): AuthUseCase => {
@@ -13,8 +13,8 @@ const makeAuthUseCase = (): AuthUseCase => {
   return new AuthUseCaseStub();
 };
 
-const makeEmailValidator = (): EmailValidator => {
-  class EmailValidatorStub implements EmailValidator {
+const makeEmailValidator = (): Validator => {
+  class EmailValidatorStub implements Validator {
     isValid(email: string): boolean {
       return true;
     }
@@ -32,7 +32,7 @@ const makeHttpRequest = (): HttpRequest => ({
 interface SutTypes {
   sut: LoginController;
   authUseCaseStub: AuthUseCase;
-  emailValidatorStub: EmailValidator;
+  emailValidatorStub: Validator;
 }
 
 const makeSut = (): SutTypes => {
@@ -119,7 +119,7 @@ describe('Login Router', () => {
   });
   test('should return 500 if no EmailValidator is provived', async () => {
     const authUseCase = makeAuthUseCase();
-    const sut = new LoginController(authUseCase, {} as EmailValidator);
+    const sut = new LoginController(authUseCase, {} as Validator);
     const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
