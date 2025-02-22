@@ -1,6 +1,18 @@
+import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '../errors';
 import { badRequest, serverError } from '../helpers/';
 import { LoginController } from './login-controller';
+
+interface SutTypes {
+  sut: LoginController;
+}
+
+const makeSut = (): SutTypes => {
+  const sut = new LoginController();
+  return {
+    sut,
+  };
+};
 
 describe('Login Router', () => {
   test('should return 400  if no email is provided', async () => {
