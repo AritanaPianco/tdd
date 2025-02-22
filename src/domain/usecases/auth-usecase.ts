@@ -4,5 +4,5 @@ export interface AuthModel {
 }
 
 export interface AuthUseCase {
-  execute(authModel: AuthModel): Promise<string>;
+  execute(authModel: AuthModel): Promise<string | null>;
 }

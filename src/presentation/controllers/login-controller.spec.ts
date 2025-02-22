@@ -104,6 +104,16 @@ describe('Login Router', () => {
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
   });
+  test('should return 500 if  AuthUseCase throws', async () => {
+    const { sut, authUseCaseStub } = makeSut();
+    vi.spyOn(authUseCaseStub, 'execute').mockImplementationOnce(() => {
+      throw new Error();
+    });
+    const httpResponse = await sut.handle(makeHttpRequest());
+    expect(httpResponse.statusCode).toBe(500);
+    expect(httpResponse.body).toEqual(new ServerError());
+    expect(httpResponse).toEqual(serverError());
+  });
   test('should return 400  if an invalid email is provided', async () => {
     const { sut, emailValidatorStub } = makeSut();
     vi.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false);
