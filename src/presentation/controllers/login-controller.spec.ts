@@ -1,6 +1,7 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { MissingParamError, ServerError } from '../errors';
+import { InvalidParamError, MissingParamError, ServerError } from '../errors';
 import { badRequest, serverError, unauthorizedError } from '../helpers/';
+import type { EmailValidator } from '../protocols';
 import { LoginController } from './login-controller';
 
 const makeAuthUseCase = (): AuthUseCase => {
@@ -12,17 +13,29 @@ const makeAuthUseCase = (): AuthUseCase => {
   return new AuthUseCaseStub();
 };
 
+const makeEmailValidator = (): EmailValidator => {
+  class EmailValidatorStub implements EmailValidator {
+    isValid(email: string): boolean {
+      return true;
+    }
+  }
+  return new EmailValidatorStub();
+};
+
 interface SutTypes {
   sut: LoginController;
   authUseCaseStub: AuthUseCase;
+  emailValidatorStub: EmailValidator;
 }
 
 const makeSut = (): SutTypes => {
   const authUseCaseStub = makeAuthUseCase();
-  const sut = new LoginController(authUseCaseStub);
+  const emailValidatorStub = makeEmailValidator();
+  const sut = new LoginController(authUseCaseStub, emailValidatorStub);
   return {
     sut,
     authUseCaseStub,
+    emailValidatorStub,
   };
 };
 
@@ -82,7 +95,7 @@ describe('Login Router', () => {
     expect(httpResponse).toEqual(unauthorizedError());
   });
   test('should return 500 if no AuthUseCase is provived', async () => {
-    const sut = new LoginController({} as AuthUseCase);
+    const sut = new LoginController({} as AuthUseCase, {} as EmailValidator);
     const httpRequest = {
       body: {
         email: 'any_email@gmail.com',
@@ -93,5 +106,17 @@ describe('Login Router', () => {
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
+  });
+  test('should return 400  if an invalid email is provided', async () => {
+    const { sut, emailValidatorStub } = makeSut();
+    vi.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false);
+    const httpRequest = {
+      body: {
+        email: 'invalid_email',
+      },
+    };
+    const httpResponse = await sut.handle(httpRequest);
+    expect(httpResponse).toEqual(badRequest(new InvalidParamError('email')));
+    expect(httpResponse.statusCode).toBe(400);
   });
 });
