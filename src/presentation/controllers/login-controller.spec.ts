@@ -1,7 +1,7 @@
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError, ServerError } from '../errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers/';
-import type { EmailValidator } from '../protocols';
+import type { EmailValidator, HttpRequest } from '../protocols';
 import { LoginController } from './login-controller';
 
 const makeAuthUseCase = (): AuthUseCase => {
@@ -21,6 +21,13 @@ const makeEmailValidator = (): EmailValidator => {
   }
   return new EmailValidatorStub();
 };
+
+const makeHttpRequest = (): HttpRequest => ({
+  body: {
+    email: 'any_@email.com',
+    password: 'any_password',
+  },
+});
 
 interface SutTypes {
   sut: LoginController;
@@ -55,7 +62,7 @@ describe('Login Router', () => {
     const { sut } = makeSut();
     const httpRequest = {
       body: {
-        email: 'any_email',
+        email: 'any_@email.com',
       },
     };
     const httpResponse = await sut.handle(httpRequest);
@@ -72,12 +79,7 @@ describe('Login Router', () => {
   test('should call AuthUseCase with corrects values', async () => {
     const { sut, authUseCaseStub } = makeSut();
     const executeSpy = vi.spyOn(authUseCaseStub, 'execute');
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        password: 'any_password',
-      },
-    };
+    const httpRequest = makeHttpRequest();
     await sut.handle(httpRequest);
     expect(executeSpy).toHaveBeenCalledWith(httpRequest.body);
   });
@@ -97,13 +99,7 @@ describe('Login Router', () => {
   test('should return 500 if no AuthUseCase is provived', async () => {
     const emailValidator = makeEmailValidator();
     const sut = new LoginController({} as AuthUseCase, emailValidator);
-    const httpRequest = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-      },
-    };
-    const httpResponse = await sut.handle(httpRequest);
+    const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
@@ -124,29 +120,17 @@ describe('Login Router', () => {
   test('should return 500 if no EmailValidator is provived', async () => {
     const authUseCase = makeAuthUseCase();
     const sut = new LoginController(authUseCase, {} as EmailValidator);
-    const httpRequest = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-      },
-    };
-    const httpResponse = await sut.handle(httpRequest);
+    const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
   });
   test('should return 500 if EmailValidator throws', async () => {
     const { sut, emailValidatorStub } = makeSut();
-    const httpRequest = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-      },
-    };
     vi.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
       throw new Error();
     });
-    const httpResponse = await sut.handle(httpRequest);
+    const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
     expect(httpResponse).toEqual(serverError());
@@ -154,24 +138,13 @@ describe('Login Router', () => {
   test('should call EmailValidator with correct email', async () => {
     const { sut, emailValidatorStub } = makeSut();
     const isValidSpy = vi.spyOn(emailValidatorStub, 'isValid');
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        password: 'any_password',
-      },
-    };
+    const httpRequest = makeHttpRequest();
     await sut.handle(httpRequest);
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email);
   });
   test('should return 200 when valid credentials is provided', async () => {
     const { sut } = makeSut();
-    const httpRequest = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-      },
-    };
-    const httpResponse = await sut.handle(httpRequest);
+    const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(200);
     expect(httpResponse).toEqual(ok('any_token'));
   });
