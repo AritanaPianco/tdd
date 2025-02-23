@@ -1,12 +1,12 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
-import type { LoadUserByEmailRepository } from '@/domain/repositories/load-user-by-email-repository';
+import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 
 export class AuthenticationUseCae implements AuthUseCase {
   constructor(
-    private readonly loadUserByEmailRepository: LoadUserByEmailRepository,
+    private readonly userRepository: UserRepository,
     private readonly hashComparer: HashComparer,
     private readonly encrypter: Encrypter,
   ) {}
@@ -16,9 +16,7 @@ export class AuthenticationUseCae implements AuthUseCase {
       throw new MissingParamError('any_field');
     }
 
-    const user = await this.loadUserByEmailRepository.loadByEmail(
-      authModel.email,
-    );
+    const user = await this.userRepository.loadByEmail(authModel.email);
     if (!user) {
       return null;
     }
