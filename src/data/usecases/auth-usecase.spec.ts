@@ -1,13 +1,15 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type { User } from '@/domain/models/user';
+import type { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
+import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 import { AuthenticationUseCae } from './authentication-usecase';
 
-const makeLoadUserByEmailRepository = (): UserRepository => {
-  class LoadUserByEmailRepositoryStub implements UserRepository {
+const makeUserRepository = (): UserRepository => {
+  class UserRepositoryStub implements UserRepository {
     async loadByEmail(email: string): Promise<User | null> {
       const user: User = {
         id: 'any_id',
@@ -17,7 +19,20 @@ const makeLoadUserByEmailRepository = (): UserRepository => {
       return user;
     }
   }
-  return new LoadUserByEmailRepositoryStub();
+  return new UserRepositoryStub();
+};
+const makeUserTokenRepository = (): UserTokenRepository => {
+  class UserTokenRepositoryStub implements UserTokenRepository {
+    async updateAccessToken(userId: string, token: string): Promise<UserToken> {
+      const userToken = {
+        id: 'userToken_id',
+        userId: 'any_id',
+        token: 'any_token',
+      };
+      return userToken;
+    }
+  }
+  return new UserTokenRepositoryStub();
 };
 
 const makeHashComparer = (): HashComparer => {
@@ -45,22 +60,26 @@ interface SutTypes {
   loadUserByEmailRepository: UserRepository;
   hashComparerStub: HashComparer;
   encrypterStub: Encrypter;
+  userTokenRepositoryStub: UserTokenRepository;
 }
 
 const makeSut = (): SutTypes => {
-  const loadUserByEmailRepository = makeLoadUserByEmailRepository();
+  const loadUserByEmailRepository = makeUserRepository();
   const hashComparerStub = makeHashComparer();
   const encrypterStub = makeEncrypter();
+  const userTokenRepositoryStub = makeUserTokenRepository();
   const sut = new AuthenticationUseCae(
     loadUserByEmailRepository,
     hashComparerStub,
     encrypterStub,
+    userTokenRepositoryStub,
   );
   return {
     sut,
     loadUserByEmailRepository,
     hashComparerStub,
     encrypterStub,
+    userTokenRepositoryStub,
   };
 };
 
@@ -147,5 +166,22 @@ describe('Auth UseCase', () => {
     const token = await sut.execute(authModel);
     expect(token).toBeTruthy();
     expect(token).toBe('any_token');
+  });
+  test('should call UserTokenRepository with corrects values', async () => {
+    const { sut, loadUserByEmailRepository, userTokenRepositoryStub } =
+      makeSut();
+    const authModel = {
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    };
+    const updateAccessTokenSpy = vi.spyOn(
+      userTokenRepositoryStub,
+      'updateAccessToken',
+    );
+    const token = await sut.execute(authModel);
+    const user = await loadUserByEmailRepository.loadByEmail(authModel.email);
+    expect(token).toBeTruthy();
+    expect(token).toBe('any_token');
+    expect(updateAccessTokenSpy).toHaveBeenCalledWith(user?.id, token);
   });
 });

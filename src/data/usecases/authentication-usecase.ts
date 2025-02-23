@@ -1,6 +1,7 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type { UserRepository } from '@/domain/repositories/user-repository';
+import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 
@@ -9,6 +10,7 @@ export class AuthenticationUseCae implements AuthUseCase {
     private readonly userRepository: UserRepository,
     private readonly hashComparer: HashComparer,
     private readonly encrypter: Encrypter,
+    private readonly userTokenRepository: UserTokenRepository,
   ) {}
 
   async execute(authModel: AuthModel): Promise<string | null> {
@@ -30,6 +32,7 @@ export class AuthenticationUseCae implements AuthUseCase {
     }
 
     const token = await this.encrypter.encrypt(user.id);
+    await this.userTokenRepository.updateAccessToken(user.id, token);
     return token;
   }
 }
