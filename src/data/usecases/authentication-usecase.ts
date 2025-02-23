@@ -1,3 +1,4 @@
+import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type { LoadUserByEmailRepository } from '@/domain/repositories/load-user-by-email-repository';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
@@ -7,6 +8,7 @@ export class AuthenticationUseCae implements AuthUseCase {
   constructor(
     private readonly loadUserByEmailRepository: LoadUserByEmailRepository,
     private readonly hashComparer: HashComparer,
+    private readonly encrypter: Encrypter,
   ) {}
 
   async execute(authModel: AuthModel): Promise<string | null> {
@@ -28,6 +30,8 @@ export class AuthenticationUseCae implements AuthUseCase {
     if (!isPasswordValid) {
       return null;
     }
+
+    await this.encrypter.encrypt(user.id);
 
     return new Promise((resolve) => resolve('any_token'));
   }
