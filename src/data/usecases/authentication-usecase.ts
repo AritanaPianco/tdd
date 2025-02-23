@@ -21,7 +21,13 @@ export class AuthenticationUseCae implements AuthUseCase {
       return null;
     }
 
-    await this.hashComparer.compare(authModel.password, user.password);
+    const isPasswordValid = await this.hashComparer.compare(
+      authModel.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      return null;
+    }
 
     return new Promise((resolve) => resolve('any_token'));
   }
