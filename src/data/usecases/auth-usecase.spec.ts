@@ -1,3 +1,4 @@
+import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type {
   LoadUserByEmailRepository,
@@ -31,23 +32,37 @@ const makeHashComparer = (): HashComparer => {
   return new HashComparerStub();
 };
 
+const makeEncrypter = (): Encrypter => {
+  class EncrypterStub implements Encrypter {
+    async encrypt(userId: string): Promise<string> {
+      return new Promise((resolve) => resolve('any_token'));
+    }
+  }
+
+  return new EncrypterStub();
+};
+
 interface SutTypes {
   sut: AuthUseCase;
   loadUserByEmailRepository: LoadUserByEmailRepository;
   hashComparerStub: HashComparer;
+  encrypterStub: Encrypter;
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepository = makeLoadUserByEmailRepository();
   const hashComparerStub = makeHashComparer();
+  const encrypterStub = makeEncrypter();
   const sut = new AuthenticationUseCae(
     loadUserByEmailRepository,
     hashComparerStub,
+    encrypterStub,
   );
   return {
     sut,
     loadUserByEmailRepository,
     hashComparerStub,
+    encrypterStub,
   };
 };
 
@@ -113,5 +128,16 @@ describe('Auth UseCase', () => {
     );
     const token = await sut.execute(authModel);
     expect(token).toBeNull();
+  });
+  test('should call Encrypter with correct userId', async () => {
+    const { sut, loadUserByEmailRepository, encrypterStub } = makeSut();
+    const authModel = {
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    };
+    const encrypterSpy = vi.spyOn(encrypterStub, 'encrypt');
+    const user = await loadUserByEmailRepository.loadByEmail(authModel.email);
+    await sut.execute(authModel);
+    expect(encrypterSpy).toHaveBeenCalledWith(user?.id);
   });
 });
