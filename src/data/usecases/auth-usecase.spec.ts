@@ -1,3 +1,4 @@
+import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type {
   LoadUserByEmailRepository,
   User,
@@ -12,7 +13,7 @@ const makeLoadUserByEmailRepository = (): LoadUserByEmailRepository => {
       const user: User = {
         id: 'any_id',
         email: 'valid_email@mail.com',
-        password: 'valid_password',
+        password: 'hashed_password',
       };
       return user;
     }
@@ -20,17 +21,33 @@ const makeLoadUserByEmailRepository = (): LoadUserByEmailRepository => {
   return new LoadUserByEmailRepositoryStub();
 };
 
+const makeHashComparer = (): HashComparer => {
+  class HashComparerStub implements HashComparer {
+    async compare(value: string, hash: string): Promise<boolean> {
+      return true;
+    }
+  }
+
+  return new HashComparerStub();
+};
+
 interface SutTypes {
   sut: AuthUseCase;
   loadUserByEmailRepository: LoadUserByEmailRepository;
+  hashComparerStub: HashComparer;
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepository = makeLoadUserByEmailRepository();
-  const sut = new AuthenticationUseCae(loadUserByEmailRepository);
+  const hashComparerStub = makeHashComparer();
+  const sut = new AuthenticationUseCae(
+    loadUserByEmailRepository,
+    hashComparerStub,
+  );
   return {
     sut,
     loadUserByEmailRepository,
+    hashComparerStub,
   };
 };
 
@@ -61,18 +78,6 @@ describe('Auth UseCase', () => {
     const token = await sut.execute(authModel);
     expect(loadByEmailSpy).toHaveBeenCalledWith(authModel.email);
   });
-  test('should return null if LoadUserByEmailRepository returns null', async () => {
-    const { sut, loadUserByEmailRepository } = makeSut();
-    const authModel = {
-      email: 'invalid_email@mail.com',
-      password: 'any_password',
-    };
-    vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
-      null!,
-    );
-    const token = await sut.execute(authModel);
-    expect(token).toBeNull();
-  });
   test('should return null if an invalid email is provided', async () => {
     const { sut, loadUserByEmailRepository } = makeSut();
     const authModel = {
@@ -85,16 +90,28 @@ describe('Auth UseCase', () => {
     const token = await sut.execute(authModel);
     expect(token).toBeNull();
   });
-  test('should return null if an invalid password is provided', async () => {
-    const { sut, loadUserByEmailRepository } = makeSut();
+  test('should call HashComparer with correct values', async () => {
+    const { sut, loadUserByEmailRepository, hashComparerStub } = makeSut();
     const authModel = {
-      email: 'valid_email@mail.com',
-      password: 'invalid_password',
+      email: 'any_email@mail.com',
+      password: 'any_password',
     };
-    vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
-      null!,
-    );
-    const token = await sut.execute(authModel);
-    expect(token).toBeNull();
+    const compareSpy = vi.spyOn(hashComparerStub, 'compare');
+    const user = await loadUserByEmailRepository.loadByEmail(authModel.email);
+    await sut.execute(authModel);
+    expect(compareSpy).toHaveBeenCalledWith('any_password', user?.password);
   });
+
+  // test('should return null if an invalid password is provided', async () => {
+  //   const { sut, loadUserByEmailRepository } = makeSut();
+  //   const authModel = {
+  //     email: 'valid_email@mail.com',
+  //     password: 'invalid_password',
+  //   };
+  //   vi.spyOn(loadUserByEmailRepository, 'loadByEmail').mockReturnValueOnce(
+  //     null!,
+  //   );
+  //   const token = await sut.execute(authModel);
+  //   expect(token).toBeNull();
+  // });
 });
