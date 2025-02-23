@@ -31,8 +31,7 @@ export class AuthenticationUseCae implements AuthUseCase {
       return null;
     }
 
-    await this.encrypter.encrypt(user.id);
-
-    return new Promise((resolve) => resolve('any_token'));
+    const token = await this.encrypter.encrypt(user.id);
+    return token;
   }
 }

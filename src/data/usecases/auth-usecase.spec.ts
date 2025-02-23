@@ -140,4 +140,14 @@ describe('Auth UseCase', () => {
     await sut.execute(authModel);
     expect(encrypterSpy).toHaveBeenCalledWith(user?.id);
   });
+  test('should return an accessToken if correct credentials are provided', async () => {
+    const { sut } = makeSut();
+    const authModel = {
+      email: 'any_email@mail.com',
+      password: 'any_password',
+    };
+    const token = await sut.execute(authModel);
+    expect(token).toBeTruthy();
+    expect(token).toBe('any_token');
+  });
 });
