@@ -1,5 +1,5 @@
-import type { User } from '../models/user';
+import type { UserProps } from '../models/user';
 
 export interface UserRepository {
-  loadByEmail(email: string): Promise<User | null>;
+  loadByEmail(email: string): Promise<UserProps | null>;
 }
