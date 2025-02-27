@@ -5,7 +5,7 @@ import type { UserTokenRepository } from '@/domain/repositories/user-token-repos
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 
-export class AuthenticationUseCae implements AuthUseCase {
+export class AuthenticationUseCase implements AuthUseCase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly hashComparer: HashComparer,

@@ -1,18 +1,19 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
-import type { User } from '@/domain/models/user';
+import type { User, UserProps } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
-import { AuthenticationUseCae } from './authentication-usecase';
+import { AuthenticationUseCase } from './authentication-usecase';
 
 const makeUserRepository = (): UserRepository => {
   class UserRepositoryStub implements UserRepository {
-    async loadByEmail(email: string): Promise<User | null> {
-      const user: User = {
+    async loadByEmail(email: string): Promise<UserProps | null> {
+      const user: UserProps = {
         id: 'any_id',
+        name: 'any_name',
         email: 'valid_email@mail.com',
         password: 'hashed_password',
       };
@@ -23,14 +24,7 @@ const makeUserRepository = (): UserRepository => {
 };
 const makeUserTokenRepository = (): UserTokenRepository => {
   class UserTokenRepositoryStub implements UserTokenRepository {
-    async updateAccessToken(userId: string, token: string): Promise<UserToken> {
-      const userToken = {
-        id: 'userToken_id',
-        userId: 'any_id',
-        token: 'any_token',
-      };
-      return userToken;
-    }
+    async updateAccessToken(userId: string, token: string): Promise<void> {}
   }
   return new UserTokenRepositoryStub();
 };
@@ -68,7 +62,7 @@ const makeSut = (): SutTypes => {
   const hashComparerStub = makeHashComparer();
   const encrypterStub = makeEncrypter();
   const userTokenRepositoryStub = makeUserTokenRepository();
-  const sut = new AuthenticationUseCae(
+  const sut = new AuthenticationUseCase(
     loadUserByEmailRepository,
     hashComparerStub,
     encrypterStub,
