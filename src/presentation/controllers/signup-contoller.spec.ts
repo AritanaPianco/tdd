@@ -1,3 +1,6 @@
+import type { User } from '@/domain/models/user';
+import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
+import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError } from '@/utils/errors';
 import { ServerError } from '../errors';
 import { badRequest, serverError } from '../helpers';
@@ -13,18 +16,43 @@ const makeEmailValidatorStub = (): Validator => {
 
   return new EmailValidatorStub();
 };
+const makeAddUserUseCaseStub = (): AddUserUseCase => {
+  class AddUserUseCaseStub implements AddUserUseCase {
+    async execute(user: User): Promise<void> {}
+  }
+
+  return new AddUserUseCaseStub();
+};
+const makeAuthUseCase = (): AuthUseCase => {
+  class AuthUseCaseStub implements AuthUseCase {
+    async execute(authModel: AuthModel): Promise<string> {
+      return new Promise((resolve) => resolve('any_token'));
+    }
+  }
+  return new AuthUseCaseStub();
+};
 
 interface SutTypes {
   sut: SignUpController;
   emailValidatorStub: Validator;
+  addUserUseCaseStub: AddUserUseCase;
+  authenticationUseCaseStub: AuthUseCase;
 }
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub();
-  const sut = new SignUpController(emailValidatorStub);
+  const addUserUseCaseStub = makeAddUserUseCaseStub();
+  const authenticationUseCaseStub = makeAuthUseCase();
+  const sut = new SignUpController(
+    emailValidatorStub,
+    addUserUseCaseStub,
+    authenticationUseCaseStub,
+  );
   return {
     sut,
     emailValidatorStub,
+    addUserUseCaseStub,
+    authenticationUseCaseStub,
   };
 };
 
@@ -110,5 +138,20 @@ describe('SignUpController', () => {
     expect(response.statusCode).toBe(500);
     expect(response.body).toEqual(new ServerError());
     expect(response).toEqual(serverError());
+  });
+  test('should call AddUserUseCase with corrects values', async () => {
+    const { sut, addUserUseCaseStub } = makeSut();
+    const httpRequest = makeHttpRequest();
+    const executeSpy = vi.spyOn(addUserUseCaseStub, 'execute');
+    await sut.handle(httpRequest);
+    expect(executeSpy).toHaveBeenCalledWith(httpRequest.body);
+  });
+  test('should call AuthenticationUseCase with corrects values', async () => {
+    const { sut, authenticationUseCaseStub } = makeSut();
+    const httpRequest = makeHttpRequest();
+    const executeSpy = vi.spyOn(authenticationUseCaseStub, 'execute');
+    await sut.handle(httpRequest);
+    const { email, password } = httpRequest.body;
+    expect(executeSpy).toHaveBeenCalledWith({ email, password });
   });
 });

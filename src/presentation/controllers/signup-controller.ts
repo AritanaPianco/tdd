@@ -1,3 +1,5 @@
+import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
+import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError } from '@/utils/errors';
 import { badRequest, serverError } from '../helpers';
 import type {
@@ -14,7 +16,11 @@ export class SignUpController implements Controller {
     body: '',
   };
 
-  constructor(private readonly emailValidator: Validator) {}
+  constructor(
+    private readonly emailValidator: Validator,
+    private readonly addUserUseCase: AddUserUseCase,
+    private readonly authenticationUseCase: AuthUseCase,
+  ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -34,6 +40,9 @@ export class SignUpController implements Controller {
       if (!isEmailValid) {
         this.response = badRequest(new InvalidParamError('email'));
       }
+
+      await this.addUserUseCase.execute(httpRequest.body);
+      await this.authenticationUseCase.execute({ email, password });
 
       return this.response;
     } catch (error) {
