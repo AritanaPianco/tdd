@@ -165,4 +165,17 @@ describe('SignUpController', () => {
     const { email, password } = httpRequest.body;
     expect(executeSpy).toHaveBeenCalledWith({ email, password });
   });
+  test('should return 500 if AuthenticationUseCase throws an error', async () => {
+    const { sut, authenticationUseCaseStub } = makeSut();
+    const httpRequest = makeHttpRequest();
+    vi.spyOn(authenticationUseCaseStub, 'execute').mockImplementationOnce(
+      () => {
+        throw new Error();
+      },
+    );
+    const response = await sut.handle(httpRequest);
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toEqual(new ServerError());
+    expect(response).toEqual(serverError());
+  });
 });
