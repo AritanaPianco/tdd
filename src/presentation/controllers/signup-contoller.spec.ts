@@ -146,6 +146,17 @@ describe('SignUpController', () => {
     await sut.handle(httpRequest);
     expect(executeSpy).toHaveBeenCalledWith(httpRequest.body);
   });
+  test('should return 500 if AddUserUseCase throws an error', async () => {
+    const { sut, addUserUseCaseStub } = makeSut();
+    const httpRequest = makeHttpRequest();
+    vi.spyOn(addUserUseCaseStub, 'execute').mockImplementationOnce(() => {
+      throw new Error();
+    });
+    const response = await sut.handle(httpRequest);
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toEqual(new ServerError());
+    expect(response).toEqual(serverError());
+  });
   test('should call AuthenticationUseCase with corrects values', async () => {
     const { sut, authenticationUseCaseStub } = makeSut();
     const httpRequest = makeHttpRequest();
