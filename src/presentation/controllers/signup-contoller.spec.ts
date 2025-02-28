@@ -3,7 +3,7 @@ import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
 import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
 import { InvalidParamError, MissingParamError } from '@/utils/errors';
 import { ServerError } from '../errors';
-import { badRequest, serverError } from '../helpers';
+import { badRequest, ok, serverError } from '../helpers';
 import type { Validator } from '../protocols';
 import { SignUpController } from './signup-controller';
 
@@ -177,5 +177,13 @@ describe('SignUpController', () => {
     expect(response.statusCode).toBe(500);
     expect(response.body).toEqual(new ServerError());
     expect(response).toEqual(serverError());
+  });
+  test('should return an accessToken on signUp success', async () => {
+    const { sut } = makeSut();
+    const httpRequest = makeHttpRequest();
+    const response = await sut.handle(httpRequest);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({ token: 'any_token' });
+    expect(response).toEqual(ok({ token: 'any_token' }));
   });
 });
