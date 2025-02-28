@@ -28,6 +28,14 @@ const makeSut = (): SutTypes => {
   };
 };
 
+const makeHttpRequest = () => ({
+  body: {
+    name: 'any_name',
+    email: 'any_email@mail.com',
+    password: 'any_password',
+  },
+});
+
 describe('SignUpController', () => {
   test('should return 400 if no name is provided', async () => {
     // sut => system under test => nosso sistema é SignUpController
@@ -69,26 +77,14 @@ describe('SignUpController', () => {
   });
   test('should call EmailValidator with correct email', async () => {
     const { sut, emailValidatorStub } = makeSut();
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-      },
-    };
+    const httpRequest = makeHttpRequest();
     const isValidSpy = vi.spyOn(emailValidatorStub, 'isValid');
-    await sut.handle(httpRequest);
+    await sut.handle(makeHttpRequest());
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email);
   });
   test('should return 400 if an invalid email is provided', async () => {
     const { sut, emailValidatorStub } = makeSut();
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'invalid_email@mail.com',
-        password: 'any_password',
-      },
-    };
+    const httpRequest = makeHttpRequest();
     vi.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false);
     const response = await sut.handle(httpRequest);
     expect(response.statusCode).toBe(400);
@@ -106,13 +102,7 @@ describe('SignUpController', () => {
 
   test('should return 500 if emailValidator throws an error', async () => {
     const { sut, emailValidatorStub } = makeSut();
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-      },
-    };
+    const httpRequest = makeHttpRequest();
     vi.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
       throw new Error();
     });
