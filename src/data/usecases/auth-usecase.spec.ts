@@ -1,6 +1,6 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
-import type { User, UserProps } from '@/domain/models/user';
+import { type User, UserProps } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
@@ -10,14 +10,14 @@ import { AuthenticationUseCase } from './authentication-usecase';
 
 const makeUserRepository = (): UserRepository => {
   class UserRepositoryStub implements UserRepository {
-    async loadByEmail(email: string): Promise<UserProps | null> {
-      const user: UserProps = {
+    async loadByEmail(email: string): Promise<User | null> {
+      const user = {
         id: 'any_id',
         name: 'any_name',
         email: 'valid_email@mail.com',
         password: 'hashed_password',
       };
-      return user;
+      return user as User;
     }
   }
   return new UserRepositoryStub();

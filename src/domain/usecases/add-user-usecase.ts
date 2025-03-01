@@ -1,5 +1,5 @@
-import type { User } from '../models/user';
+import type { UserProps } from '../models/user';
 
 export interface AddUserUseCase {
-  execute(user: User): Promise<void>;
+  execute(user: UserProps): Promise<void>;
 }

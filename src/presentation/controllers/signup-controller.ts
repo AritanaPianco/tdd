@@ -8,7 +8,6 @@ import type {
   HttpResponse,
   Validator,
 } from '../protocols';
-// nosso sistema -> signupController
 
 export class SignUpController implements Controller {
   constructor(
