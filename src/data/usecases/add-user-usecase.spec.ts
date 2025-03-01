@@ -1,16 +1,32 @@
 import type { Hash } from '@/domain/cryptography/hash';
 import { AddUser } from './add-user-usecase';
 
+const makeHashStub = (): Hash => {
+  class HashStub implements Hash {
+    async hash(value: string, salt: number): Promise<string> {
+      return new Promise((resolve) => resolve('hashed_value'));
+    }
+  }
+  return new HashStub();
+};
+
+interface SutTypes {
+  sut: AddUser;
+  hashStub: Hash;
+}
+
+const makeSut = (): SutTypes => {
+  const hashStub = makeHashStub();
+  const sut = new AddUser(hashStub);
+  return {
+    sut,
+    hashStub,
+  };
+};
+
 describe('AddUser UseCase', () => {
   test('should call Hash with correct password', async () => {
-    class HashStub implements Hash {
-      async hash(value: string, salt: number): Promise<string> {
-        return new Promise((resolve) => resolve('hashed_value'));
-      }
-    }
-
-    const hashStub = new HashStub();
-    const sut = new AddUser(hashStub);
+    const { sut, hashStub } = makeSut();
     const user = {
       name: 'any_name',
       email: 'any_email@mail.com',
