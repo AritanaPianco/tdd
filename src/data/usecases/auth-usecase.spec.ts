@@ -25,6 +25,10 @@ const makeUserRepository = (): UserRepository => {
 };
 const makeUserTokenRepository = (): UserTokenRepository => {
   class UserTokenRepositoryStub implements UserTokenRepository {
+    async findByToken(token: string): Promise<UserToken> {
+      throw new Error('Method not implemented.');
+    }
+    async create(data: User, token: string): Promise<void> {}
     async updateAccessToken(userId: string, token: string): Promise<void> {}
   }
   return new UserTokenRepositoryStub();
