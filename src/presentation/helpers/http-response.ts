@@ -1,3 +1,4 @@
+import { ConflictError } from '@/utils/errors';
 import { ServerError, UnauthorizedError } from '../errors';
 import type { HttpResponse } from '../protocols/';
 
@@ -19,6 +20,13 @@ export const serverError = (): HttpResponse => {
   return {
     statusCode: 500,
     body: new ServerError(),
+  };
+};
+
+export const conflictError = (param: string) => {
+  return {
+    statusCode: 409,
+    body: new ConflictError(param),
   };
 };
 

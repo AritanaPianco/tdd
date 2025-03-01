@@ -10,6 +10,7 @@ import { AuthenticationUseCase } from './authentication-usecase';
 
 const makeUserRepository = (): UserRepository => {
   class UserRepositoryStub implements UserRepository {
+    async create(user: User): Promise<void> {}
     async loadByEmail(email: string): Promise<User | null> {
       const user = {
         id: 'any_id',
