@@ -157,6 +157,6 @@ describe('Login Router', () => {
     const { sut } = makeSut();
     const httpResponse = await sut.handle(makeHttpRequest());
     expect(httpResponse.statusCode).toBe(200);
-    expect(httpResponse).toEqual(ok('any_token'));
+    expect(httpResponse).toEqual(ok({ token: 'any_token' }));
   });
 });

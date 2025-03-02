@@ -1,7 +1,11 @@
 import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
 import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { InvalidParamError, MissingParamError } from '@/utils/errors';
-import { badRequest, ok, serverError } from '../helpers';
+import {
+  ConflictError,
+  InvalidParamError,
+  MissingParamError,
+} from '@/utils/errors';
+import { badRequest, conflictError, ok, serverError } from '../helpers';
 import type {
   Controller,
   HttpRequest,
@@ -13,7 +17,6 @@ export class SignUpController implements Controller {
   constructor(
     private readonly emailValidator: Validator,
     private readonly addUserUseCase: AddUserUseCase,
-    private readonly authenticationUseCase: AuthUseCase,
   ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -35,13 +38,11 @@ export class SignUpController implements Controller {
         return badRequest(new InvalidParamError('email'));
       }
 
-      await this.addUserUseCase.execute(httpRequest.body);
-      const token = await this.authenticationUseCase.execute({
-        email,
-        password,
-      });
-
-      return ok({ token });
+      const result = await this.addUserUseCase.execute(httpRequest.body);
+      if (result.statusCode === 409) {
+        return conflictError('email');
+      }
+      return ok({ token: result });
     } catch (error) {
       return serverError();
     }

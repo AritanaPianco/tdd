@@ -18,41 +18,28 @@ const makeEmailValidatorStub = (): Validator => {
 };
 const makeAddUserUseCaseStub = (): AddUserUseCase => {
   class AddUserUseCaseStub implements AddUserUseCase {
-    async execute(user: User): Promise<void> {}
-  }
-
-  return new AddUserUseCaseStub();
-};
-const makeAuthUseCase = (): AuthUseCase => {
-  class AuthUseCaseStub implements AuthUseCase {
-    async execute(authModel: AuthModel): Promise<string> {
+    async execute(user: User): Promise<string | any> {
       return new Promise((resolve) => resolve('any_token'));
     }
   }
-  return new AuthUseCaseStub();
+
+  return new AddUserUseCaseStub();
 };
 
 interface SutTypes {
   sut: SignUpController;
   emailValidatorStub: Validator;
   addUserUseCaseStub: AddUserUseCase;
-  authenticationUseCaseStub: AuthUseCase;
 }
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub();
   const addUserUseCaseStub = makeAddUserUseCaseStub();
-  const authenticationUseCaseStub = makeAuthUseCase();
-  const sut = new SignUpController(
-    emailValidatorStub,
-    addUserUseCaseStub,
-    authenticationUseCaseStub,
-  );
+  const sut = new SignUpController(emailValidatorStub, addUserUseCaseStub);
   return {
     sut,
     emailValidatorStub,
     addUserUseCaseStub,
-    authenticationUseCaseStub,
   };
 };
 
@@ -152,27 +139,6 @@ describe('SignUpController', () => {
     vi.spyOn(addUserUseCaseStub, 'execute').mockImplementationOnce(() => {
       throw new Error();
     });
-    const response = await sut.handle(httpRequest);
-    expect(response.statusCode).toBe(500);
-    expect(response.body).toEqual(new ServerError());
-    expect(response).toEqual(serverError());
-  });
-  test('should call AuthenticationUseCase with corrects values', async () => {
-    const { sut, authenticationUseCaseStub } = makeSut();
-    const httpRequest = makeHttpRequest();
-    const executeSpy = vi.spyOn(authenticationUseCaseStub, 'execute');
-    await sut.handle(httpRequest);
-    const { email, password } = httpRequest.body;
-    expect(executeSpy).toHaveBeenCalledWith({ email, password });
-  });
-  test('should return 500 if AuthenticationUseCase throws an error', async () => {
-    const { sut, authenticationUseCaseStub } = makeSut();
-    const httpRequest = makeHttpRequest();
-    vi.spyOn(authenticationUseCaseStub, 'execute').mockImplementationOnce(
-      () => {
-        throw new Error();
-      },
-    );
     const response = await sut.handle(httpRequest);
     expect(response.statusCode).toBe(500);
     expect(response.body).toEqual(new ServerError());

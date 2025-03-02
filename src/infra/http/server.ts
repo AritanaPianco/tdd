@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { loginRoute } from '@/presentation/routes/login-route';
 import { SignUpRoute } from '@/presentation/routes/signup-route';
 import fastify from 'fastify';

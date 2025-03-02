@@ -5,7 +5,12 @@ import { prisma } from '@/infra';
 export class UsersRepository implements UserRepository {
   async create(data: User): Promise<void> {
     await prisma.user.create({
-      data,
+      data: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      },
     });
   }
   async loadByEmail(email: string): Promise<User | null> {

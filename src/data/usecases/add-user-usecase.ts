@@ -14,7 +14,7 @@ export class AddUser implements AddUserUseCase {
     private readonly usersTokenRepository: UserTokenRepository,
   ) {}
 
-  async execute(user: UserProps): Promise<any> {
+  async execute(user: UserProps): Promise<string | any> {
     const userFound = await this.usersRepository.loadByEmail(user.email);
     if (userFound) {
       return conflictError('email');
@@ -30,5 +30,6 @@ export class AddUser implements AddUserUseCase {
     await this.usersRepository.create(newUser);
     const token = await this.encrypter.encrypt(newUser.id);
     await this.usersTokenRepository.create(newUser, token);
+    return token;
   }
 }
