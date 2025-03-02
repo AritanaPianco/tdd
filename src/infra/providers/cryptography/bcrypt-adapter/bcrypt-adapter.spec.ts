@@ -5,6 +5,7 @@ vi.mock('bcrypt', () => {
   return {
     default: {
       compare: vi.fn(async (value: string, hash: string) => true),
+      hash: vi.fn(async (value: string, salt: number) => 'hashed_password'),
     },
   };
 });
@@ -50,5 +51,15 @@ describe('Bcrypt Adapter', () => {
       valuesToCompare.hash,
     );
     expect(result).toBe(true);
+  });
+  test('should call hash with corrects values', async () => {
+    const sut = new BcryptAdapter();
+    const values = {
+      password: 'any_password',
+      salt: 8,
+    };
+    const hashSpy = vi.spyOn(bcrypt, 'hash');
+    await sut.hash(values.password, values.salt);
+    expect(hashSpy).toHaveBeenCalledWith(values.password, values.salt);
   });
 });
