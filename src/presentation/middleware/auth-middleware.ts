@@ -16,7 +16,10 @@ export class AuthMiddleware implements Middleware {
     if (!accessToken) {
       this.reponse = forbiddenError(new AccessDeniedError());
     }
-    await this.loadUserByToken.execute(accessToken);
+    const user = await this.loadUserByToken.execute(accessToken);
+    if (!user) {
+      this.reponse = forbiddenError(new AccessDeniedError());
+    }
     return this.reponse;
   }
 }

@@ -5,12 +5,12 @@ import { forbiddenError } from '../helpers';
 import { AuthMiddleware } from './auth-middleware';
 
 const makeLoadUserByToken = (): LoadUserByToken => {
-  class LoadUserByTokenStub implements LoadUserByToken {
-    async execute(token: string): Promise<User> {
-      return new Promise((resolve) => resolve(null!));
+  class LoadUserByTokenUseCaseStub implements LoadUserByToken {
+    async execute(token: string): Promise<User | null> {
+      return new Promise((resolve) => resolve(null));
     }
   }
-  return new LoadUserByTokenStub();
+  return new LoadUserByTokenUseCaseStub();
 };
 
 interface SutTypes {
@@ -38,7 +38,7 @@ describe('AuthMiddleware', () => {
     expect(response.body).toEqual(new AccessDeniedError());
     expect(response).toEqual(forbiddenError(new AccessDeniedError()));
   });
-  test('should call loadUserByToken with correct access token', async () => {
+  test('should call loadUserByTokenUseCase with correct access token', async () => {
     const { sut, loadUserByTokenStub } = makeSut();
     const httpRequest = {
       headers: {
@@ -48,5 +48,20 @@ describe('AuthMiddleware', () => {
     const executeSpy = vi.spyOn(loadUserByTokenStub, 'execute');
     await sut.handle(httpRequest);
     expect(executeSpy).toHaveBeenCalledWith('any_token');
+  });
+  test('should return 403 if loadUserByTokenUseCase returns null', async () => {
+    const { sut, loadUserByTokenStub } = makeSut();
+    const httpRequest = {
+      headers: {
+        authorization: 'any_token',
+      },
+    };
+    vi.spyOn(loadUserByTokenStub, 'execute').mockReturnValueOnce(
+      new Promise((resolve) => resolve(null)),
+    );
+    const response = await sut.handle(httpRequest);
+    expect(response.statusCode).toBe(403);
+    expect(response.body).toEqual(new AccessDeniedError());
+    expect(response).toEqual(forbiddenError(new AccessDeniedError()));
   });
 });
