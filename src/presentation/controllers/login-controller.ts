@@ -9,11 +9,6 @@ import type {
 } from '../protocols/';
 
 export class LoginController implements Controller {
-  private response: HttpResponse = {
-    statusCode: 0,
-    body: '',
-  };
-
   constructor(
     private readonly authUseCase: AuthUseCase,
     private readonly emailValidator: Validator,

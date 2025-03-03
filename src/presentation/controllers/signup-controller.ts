@@ -1,5 +1,4 @@
 import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
-import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
 import {
   ConflictError,
   InvalidParamError,

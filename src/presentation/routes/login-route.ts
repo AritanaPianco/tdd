@@ -13,7 +13,7 @@ const schema = {
 };
 
 export async function loginRoute(app: FastifyInstance) {
-  app.post('/login', { schema }, async (request, reply) => {
+  app.post('/login', async (request, reply) => {
     const { email, password } = request.body as {
       email: string;
       password: string;
@@ -25,6 +25,7 @@ export async function loginRoute(app: FastifyInstance) {
         password,
       },
     };
+    console.log(request.headers);
     const response = await loginController.handle(customRequest);
     reply.status(response.statusCode).send(response.body);
   });
