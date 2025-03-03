@@ -9,14 +9,14 @@ export class AuthMiddleware implements Middleware {
     body: undefined,
   };
 
-  //   constructor(private readonly loadUserByToken: LoadUserByToken) {}
+  constructor(private readonly loadUserByToken: LoadUserByToken) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     const accessToken = httpRequest.headers['authorization'];
     if (!accessToken) {
       this.reponse = forbiddenError(new AccessDeniedError());
     }
-    // await this.loadUserByToken.execute(accessToken);
+    await this.loadUserByToken.execute(accessToken);
     return this.reponse;
   }
 }

@@ -20,7 +20,7 @@ interface SutTypes {
 
 const makeSut = (): SutTypes => {
   const loadUserByTokenStub = makeLoadUserByToken();
-  const sut = new AuthMiddleware();
+  const sut = new AuthMiddleware(loadUserByTokenStub);
   return {
     sut,
     loadUserByTokenStub,
@@ -37,5 +37,16 @@ describe('AuthMiddleware', () => {
     expect(response.statusCode).toBe(403);
     expect(response.body).toEqual(new AccessDeniedError());
     expect(response).toEqual(forbiddenError(new AccessDeniedError()));
+  });
+  test('should call loadUserByToken with correct access token', async () => {
+    const { sut, loadUserByTokenStub } = makeSut();
+    const httpRequest = {
+      headers: {
+        authorization: 'any_token',
+      },
+    };
+    const executeSpy = vi.spyOn(loadUserByTokenStub, 'execute');
+    await sut.handle(httpRequest);
+    expect(executeSpy).toHaveBeenCalledWith('any_token');
   });
 });
