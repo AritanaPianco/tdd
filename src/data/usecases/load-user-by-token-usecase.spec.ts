@@ -25,7 +25,13 @@ const makeUsersTokensRepository = (): UserTokenRepository => {
       return userToken[0];
     }
 
-    async create(data: User, token: string): Promise<void> {}
+    async create(data: User, token: string): Promise<void> {
+      this.usersToken.push({
+        id: 'any_userTokenId',
+        userId: 'any_id',
+        token: 'any_token',
+      } as UserToken);
+    }
 
     async updateAccessToken(userId: string, token: string): Promise<void> {}
   }
@@ -83,5 +89,23 @@ describe('LoadUserByToken UseCase', () => {
     );
     const user = await sut.execute('any_token');
     expect(user).toBeNull();
+  });
+
+  test('should return an userId on success', async () => {
+    const { sut, usersTokensRepositoryStub } = makeSut();
+    const token = 'any_token';
+    await usersTokensRepositoryStub.create(
+      {
+        id: 'any_id',
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'any_password',
+      } as User,
+      'any_token',
+    );
+    const response = await sut.execute(token);
+    expect(response).toHaveProperty('id');
+    expect(response).toHaveProperty('userId');
+    expect(response).toHaveProperty('token');
   });
 });

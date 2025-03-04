@@ -1,5 +1,5 @@
 import type { Decrypter } from '@/domain/cryptography/decrypter';
-import type { User } from '@/domain/models/user';
+import type { UserToken } from '@/domain/models/user-token';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { LoadUserByToken } from '@/domain/usecases/load-user-by-token';
 
@@ -9,7 +9,7 @@ export class LoadUserByTokenUseCase implements LoadUserByToken {
     private readonly usersTokensRepository: UserTokenRepository,
   ) {}
 
-  async execute(token: string): Promise<User | null> {
+  async execute(token: string): Promise<UserToken | null> {
     const decodedValue = await this.decrypter.decrypt(token);
     if (!decodedValue) {
       return null;
@@ -18,5 +18,6 @@ export class LoadUserByTokenUseCase implements LoadUserByToken {
     if (!user) {
       return null;
     }
+    return user;
   }
 }
