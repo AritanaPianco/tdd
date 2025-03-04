@@ -76,4 +76,12 @@ describe('LoadUserByToken UseCase', () => {
     await sut.execute(token);
     expect(findByTokenSpy).toHaveBeenCalledWith('any_token');
   });
+  test('should returns null if usersTokenRepository returns null', async () => {
+    const { sut, usersTokensRepositoryStub } = makeSut();
+    vi.spyOn(usersTokensRepositoryStub, 'findByToken').mockReturnValueOnce(
+      new Promise((resolve) => resolve(null)),
+    );
+    const user = await sut.execute('any_token');
+    expect(user).toBeNull();
+  });
 });

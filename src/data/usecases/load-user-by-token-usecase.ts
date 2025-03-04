@@ -14,6 +14,9 @@ export class LoadUserByTokenUseCase implements LoadUserByToken {
     if (!decodedValue) {
       return null;
     }
-    await this.usersTokensRepository.findByToken(token);
+    const user = await this.usersTokensRepository.findByToken(token);
+    if (!user) {
+      return null;
+    }
   }
 }
