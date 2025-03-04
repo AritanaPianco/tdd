@@ -3,6 +3,6 @@ export interface AuthModel {
   password: string;
 }
 
-export interface AuthUseCase {
+export interface Auth {
   execute({ email, password }: AuthModel): Promise<string | null>;
 }

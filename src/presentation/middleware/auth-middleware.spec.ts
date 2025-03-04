@@ -1,4 +1,4 @@
-import type { User } from '@/domain/models/user';
+import type { UserToken } from '@/domain/models/user-token';
 import type { LoadUserByToken } from '@/domain/usecases/load-user-by-token';
 import { AccessDeniedError } from '../errors';
 import { forbiddenError, ok } from '../helpers';
@@ -6,14 +6,13 @@ import { AuthMiddleware } from './auth-middleware';
 
 const makeLoadUserByToken = (): LoadUserByToken => {
   class LoadUserByTokenUseCaseStub implements LoadUserByToken {
-    async execute(token: string): Promise<User | null> {
+    async execute(token: string): Promise<UserToken | null> {
       const fakerUser = {
-        id: 'valid_id',
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
+        id: 'any_userTokenId',
+        userId: 'any_id',
+        token: 'any_token',
       };
-      return new Promise((resolve) => resolve(fakerUser as User));
+      return new Promise((resolve) => resolve(fakerUser as UserToken));
     }
   }
   return new LoadUserByTokenUseCaseStub();
@@ -48,7 +47,7 @@ describe('AuthMiddleware', () => {
     const { sut, loadUserByTokenStub } = makeSut();
     const httpRequest = {
       headers: {
-        authorization: 'any_token',
+        authorization: 'Bearer any_token',
       },
     };
     const executeSpy = vi.spyOn(loadUserByTokenStub, 'execute');
@@ -79,7 +78,7 @@ describe('AuthMiddleware', () => {
     };
     const response = await sut.handle(httpRequest);
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({ userId: 'valid_id' });
-    expect(response).toEqual(ok({ userId: 'valid_id' }));
+    expect(response.body).toEqual({ userId: 'any_id' });
+    expect(response).toEqual(ok({ userId: 'any_id' }));
   });
 });

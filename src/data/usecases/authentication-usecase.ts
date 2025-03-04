@@ -2,10 +2,10 @@ import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
-import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
+import type { Auth, AuthModel } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 
-export class AuthenticationUseCase implements AuthUseCase {
+export class AuthenticationUseCase implements Auth {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly hashComparer: HashComparer,

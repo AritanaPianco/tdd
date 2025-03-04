@@ -1,15 +1,18 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { HashComparer } from '@/domain/cryptography/hash-comparer';
-import { type User, UserProps } from '@/domain/models/user';
+import type { User } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
-import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
+import type { Auth, AuthModel } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/utils/errors';
 import { AuthenticationUseCase } from './authentication-usecase';
 
 const makeUserRepository = (): UserRepository => {
   class UserRepositoryStub implements UserRepository {
+    async findAll(): Promise<User[]> {
+      throw new Error('Method not implemented.');
+    }
     async create(user: User): Promise<void> {}
     async loadByEmail(email: string): Promise<User | null> {
       const user = {
@@ -55,7 +58,7 @@ const makeEncrypter = (): Encrypter => {
 };
 
 interface SutTypes {
-  sut: AuthUseCase;
+  sut: Auth;
   loadUserByEmailRepository: UserRepository;
   hashComparerStub: HashComparer;
   encrypterStub: Encrypter;

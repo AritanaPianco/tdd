@@ -7,14 +7,15 @@ export class AuthMiddleware implements Middleware {
   constructor(private readonly loadUserByToken: LoadUserByToken) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-    const accessToken = httpRequest.headers['authorization'];
-    if (!accessToken) {
+    if (!httpRequest.headers['authorization']) {
       return forbiddenError(new AccessDeniedError());
     }
-    const user = await this.loadUserByToken.execute(accessToken);
+    const accessToken = httpRequest.headers['authorization'];
+    const token = accessToken.split(' ')[1];
+    const user = await this.loadUserByToken.execute(token);
     if (!user) {
       return forbiddenError(new AccessDeniedError());
     }
-    return ok({ userId: user?.id });
+    return ok({ userId: user.userId });
   }
 }

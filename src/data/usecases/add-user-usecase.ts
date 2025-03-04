@@ -3,10 +3,10 @@ import type { Hash } from '@/domain/cryptography/hash';
 import { User, type UserProps } from '@/domain/models/user';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
-import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
+import type { AddUser } from '@/domain/usecases/add-user-usecase';
 import { conflictError } from '@/presentation/helpers';
 
-export class AddUser implements AddUserUseCase {
+export class AddUserUseCase implements AddUser {
   constructor(
     private readonly usersRepository: UserRepository,
     private readonly hash: Hash,

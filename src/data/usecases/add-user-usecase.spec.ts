@@ -6,7 +6,7 @@ import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import { conflictError } from '@/presentation/helpers';
 import { ConflictError } from '@/utils/errors';
-import { AddUser } from './add-user-usecase';
+import { AddUserUseCase } from './add-user-usecase';
 
 const makeFakerUser = () => ({
   id: 'any_id',
@@ -17,6 +17,9 @@ const makeFakerUser = () => ({
 
 const makeUserRepository = (): UserRepository => {
   class UserRepositoryStub implements UserRepository {
+    async findAll(): Promise<User[]> {
+      throw new Error('Method not implemented.');
+    }
     private users: User[] = [];
 
     async create(user: User): Promise<void> {
@@ -64,7 +67,7 @@ const makeUserTokenRepository = (): UserTokenRepository => {
 };
 
 interface SutTypes {
-  sut: AddUser;
+  sut: AddUserUseCase;
   hashStub: Hash;
   usersRepositoryStub: UserRepository;
   encrypterStub: Encrypter;
@@ -76,7 +79,7 @@ const makeSut = (): SutTypes => {
   const hashStub = makeHashStub();
   const encrypterStub = makeEncrypter();
   const usersTokenRepositoryStub = makeUserTokenRepository();
-  const sut = new AddUser(
+  const sut = new AddUserUseCase(
     usersRepositoryStub,
     hashStub,
     encrypterStub,

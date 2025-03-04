@@ -1,4 +1,4 @@
-import type { User, UserProps } from '@/domain/models/user';
+import type { User } from '@/domain/models/user';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import { prisma } from '@/infra';
 
@@ -18,5 +18,9 @@ export class UsersRepository implements UserRepository {
       where: { email },
     });
     return user as User;
+  }
+  async findAll(): Promise<User[]> {
+    const users = await prisma.user.findMany();
+    return users as User[];
   }
 }
