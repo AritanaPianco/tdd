@@ -1,8 +1,18 @@
+import type { Decrypter } from '@/domain/cryptography/decrypter';
+import { LoadUserByTokenUseCase } from './load-user-by-token-usecase';
+
 describe('LoadUserByToken UseCase', () => {
-  //    test('should return null if an invalid access token is provided', async () => {
-  //        const sut = new LoadUserByTokenUseCase()
-  //        const token = 'any_token'
-  //        const response = await sut.execute(token)
-  //        expect(response).toBe(null)
-  //    })
+  test('should call Decrypter with correct token', async () => {
+    class DecrypterStub implements Decrypter {
+      async decrypt(value: string): Promise<string> {
+        return new Promise((resolve) => resolve('decoded_value'));
+      }
+    }
+    const decrypterStub = new DecrypterStub();
+    const decryptSpy = vi.spyOn(decrypterStub, 'decrypt');
+    const sut = new LoadUserByTokenUseCase(decrypterStub);
+    const token = 'any_token';
+    await sut.execute(token);
+    expect(decryptSpy).toHaveBeenCalledWith('any_token');
+  });
 });
