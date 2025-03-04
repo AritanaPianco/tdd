@@ -6,6 +6,9 @@ export class LoadUserByTokenUseCase implements LoadUserByToken {
   constructor(private readonly decrypter: Decrypter) {}
 
   async execute(token: string): Promise<User | null> {
-    await this.decrypter.decrypt(token);
+    const decodedValue = await this.decrypter.decrypt(token);
+    if (!decodedValue) {
+      return null;
+    }
   }
 }
