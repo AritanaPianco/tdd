@@ -1,7 +1,6 @@
 import type { User } from '@/domain/models/user';
-import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
-import type { AuthModel, AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { InvalidParamError, MissingParamError } from '@/utils/errors';
+import type { AddUser } from '@/domain/usecases/add-user-usecase';
+import { InvalidParamError, MissingParamError } from '../errors';
 import { ServerError } from '../errors';
 import { badRequest, ok, serverError } from '../helpers';
 import type { Validator } from '../protocols';
@@ -16,8 +15,8 @@ const makeEmailValidatorStub = (): Validator => {
 
   return new EmailValidatorStub();
 };
-const makeAddUserUseCaseStub = (): AddUserUseCase => {
-  class AddUserUseCaseStub implements AddUserUseCase {
+const makeAddUserUseCaseStub = (): AddUser => {
+  class AddUserUseCaseStub implements AddUser {
     async execute(user: User): Promise<string | any> {
       return new Promise((resolve) => resolve('any_token'));
     }
@@ -29,7 +28,7 @@ const makeAddUserUseCaseStub = (): AddUserUseCase => {
 interface SutTypes {
   sut: SignUpController;
   emailValidatorStub: Validator;
-  addUserUseCaseStub: AddUserUseCase;
+  addUserUseCaseStub: AddUser;
 }
 
 const makeSut = (): SutTypes => {

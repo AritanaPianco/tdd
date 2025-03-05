@@ -1,6 +1,7 @@
 import type { Encrypter } from '@/domain/cryptography/encrypter';
 import type { Hash } from '@/domain/cryptography/hash';
 import { User, type UserProps } from '@/domain/models/user';
+import { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { AddUser } from '@/domain/usecases/add-user-usecase';
@@ -29,7 +30,8 @@ export class AddUserUseCase implements AddUser {
 
     await this.usersRepository.create(newUser);
     const token = await this.encrypter.encrypt(newUser.id);
-    await this.usersTokenRepository.create(newUser, token);
+    const userToken = UserToken.create({ userId: newUser.id, token });
+    await this.usersTokenRepository.create(userToken);
     return token;
   }
 }

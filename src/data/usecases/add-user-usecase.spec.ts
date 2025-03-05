@@ -4,8 +4,10 @@ import type { User } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
+import { ConflictError } from '@/presentation/errors';
 import { conflictError } from '@/presentation/helpers';
-import { ConflictError } from '@/utils/errors';
+import { UsersRepositoryInMemory } from '@/test/repositories-in-memory/users-repository-in-memory';
+import { UsersTokenRepositoryInMemory } from '@/test/repositories-in-memory/users-token-repository-in-memory';
 import { AddUserUseCase } from './add-user-usecase';
 
 const makeFakerUser = () => ({
@@ -14,27 +16,6 @@ const makeFakerUser = () => ({
   email: 'any_email@mail.com',
   password: 'any_password',
 });
-
-const makeUserRepository = (): UserRepository => {
-  class UserRepositoryStub implements UserRepository {
-    async findAll(): Promise<User[]> {
-      throw new Error('Method not implemented.');
-    }
-    private users: User[] = [];
-
-    async create(user: User): Promise<void> {
-      this.users.push(user);
-    }
-    async loadByEmail(email: string): Promise<User | null> {
-      const user = this.users.find((user) => user.email === email);
-      if (!user) {
-        return null;
-      }
-      return user;
-    }
-  }
-  return new UserRepositoryStub();
-};
 
 const makeHashStub = (): Hash => {
   class HashStub implements Hash {
@@ -55,17 +36,6 @@ const makeEncrypter = (): Encrypter => {
   return new EncrypterStub();
 };
 
-const makeUserTokenRepository = (): UserTokenRepository => {
-  class UserTokenRepositoryStub implements UserTokenRepository {
-    async findByToken(token: string): Promise<UserToken> {
-      throw new Error('Method not implemented.');
-    }
-    async create(data: User, token: string): Promise<void> {}
-    async updateAccessToken(userId: string, token: string): Promise<void> {}
-  }
-  return new UserTokenRepositoryStub();
-};
-
 interface SutTypes {
   sut: AddUserUseCase;
   hashStub: Hash;
@@ -75,10 +45,10 @@ interface SutTypes {
 }
 
 const makeSut = (): SutTypes => {
-  const usersRepositoryStub = makeUserRepository();
+  const usersRepositoryStub = new UsersRepositoryInMemory();
   const hashStub = makeHashStub();
   const encrypterStub = makeEncrypter();
-  const usersTokenRepositoryStub = makeUserTokenRepository();
+  const usersTokenRepositoryStub = new UsersTokenRepositoryInMemory();
   const sut = new AddUserUseCase(
     usersRepositoryStub,
     hashStub,

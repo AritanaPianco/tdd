@@ -3,7 +3,7 @@ import type { HashComparer } from '@/domain/cryptography/hash-comparer';
 import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { Auth, AuthModel } from '@/domain/usecases/auth-usecase';
-import { MissingParamError } from '@/utils/errors';
+import { MissingParamError } from '@/presentation/errors';
 
 export class AuthenticationUseCase implements Auth {
   constructor(

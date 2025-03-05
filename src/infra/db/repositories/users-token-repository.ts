@@ -1,14 +1,13 @@
-import type { User } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import { prisma } from '@/infra';
 
 export class UsersTokenRepository implements UserTokenRepository {
-  async create(user: User, token: string): Promise<void> {
+  async create(userToken: UserToken): Promise<void> {
     await prisma.userToken.create({
       data: {
-        userId: user.id,
-        token: token,
+        userId: userToken.userId,
+        token: userToken.token,
       },
     });
   }

@@ -1,7 +1,7 @@
 import type { Decrypter } from '@/domain/cryptography/decrypter';
-import type { User } from '@/domain/models/user';
 import type { UserToken } from '@/domain/models/user-token';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
+import { UsersTokenRepositoryInMemory } from '@/test/repositories-in-memory/users-token-repository-in-memory';
 import { LoadUserByTokenUseCase } from './load-user-by-token-usecase';
 
 const makeDecrypter = (): Decrypter => {
@@ -14,30 +14,6 @@ const makeDecrypter = (): Decrypter => {
   return new DecrypterStub();
 };
 
-const makeUsersTokensRepository = (): UserTokenRepository => {
-  class UsersTokensRepositoryStub implements UserTokenRepository {
-    private usersToken: UserToken[] = [];
-
-    async findByToken(token: string): Promise<UserToken> {
-      const userToken = this.usersToken.filter(
-        (userToken) => userToken.token === token,
-      );
-      return userToken[0];
-    }
-
-    async create(data: User, token: string): Promise<void> {
-      this.usersToken.push({
-        id: 'any_userTokenId',
-        userId: 'any_id',
-        token: 'any_token',
-      } as UserToken);
-    }
-
-    async updateAccessToken(userId: string, token: string): Promise<void> {}
-  }
-  return new UsersTokensRepositoryStub();
-};
-
 interface SutTypes {
   sut: LoadUserByTokenUseCase;
   decrypterStub: Decrypter;
@@ -46,7 +22,7 @@ interface SutTypes {
 
 const makeSut = (): SutTypes => {
   const decrypterStub = makeDecrypter();
-  const usersTokensRepositoryStub = makeUsersTokensRepository();
+  const usersTokensRepositoryStub = new UsersTokenRepositoryInMemory();
   const sut = new LoadUserByTokenUseCase(
     decrypterStub,
     usersTokensRepositoryStub,
@@ -94,15 +70,12 @@ describe('LoadUserByToken UseCase', () => {
   test('should return an userId on success', async () => {
     const { sut, usersTokensRepositoryStub } = makeSut();
     const token = 'any_token';
-    await usersTokensRepositoryStub.create(
-      {
-        id: 'any_id',
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-      } as User,
-      'any_token',
-    );
+    const userToken = {
+      id: 'any_id',
+      userId: 'any_userId',
+      token: 'any_token',
+    } as UserToken;
+    await usersTokensRepositoryStub.create(userToken);
     const response = await sut.execute(token);
     expect(response).toHaveProperty('id');
     expect(response).toHaveProperty('userId');

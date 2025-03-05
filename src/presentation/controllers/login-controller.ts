@@ -1,5 +1,5 @@
-import type { AuthUseCase } from '@/domain/usecases/auth-usecase';
-import { InvalidParamError, MissingParamError } from '@/utils/errors';
+import type { Auth } from '@/domain/usecases/auth-usecase';
+import { InvalidParamError, MissingParamError } from '../errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers';
 import type {
   Controller,
@@ -10,7 +10,7 @@ import type {
 
 export class LoginController implements Controller {
   constructor(
-    private readonly authUseCase: AuthUseCase,
+    private readonly authUseCase: Auth,
     private readonly emailValidator: Validator,
   ) {}
 

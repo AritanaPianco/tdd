@@ -1,9 +1,5 @@
-import type { AddUserUseCase } from '@/domain/usecases/add-user-usecase';
-import {
-  ConflictError,
-  InvalidParamError,
-  MissingParamError,
-} from '@/utils/errors';
+import type { AddUser } from '@/domain/usecases/add-user-usecase';
+import { InvalidParamError, MissingParamError } from '../errors';
 import { badRequest, conflictError, ok, serverError } from '../helpers';
 import type {
   Controller,
@@ -15,7 +11,7 @@ import type {
 export class SignUpController implements Controller {
   constructor(
     private readonly emailValidator: Validator,
-    private readonly addUserUseCase: AddUserUseCase,
+    private readonly addUserUseCase: AddUser,
   ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {

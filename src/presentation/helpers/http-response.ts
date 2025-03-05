@@ -1,4 +1,4 @@
-import { ConflictError } from '@/utils/errors';
+import { ConflictError } from '../errors';
 import { ServerError, UnauthorizedError } from '../errors';
 import type { HttpResponse } from '../protocols/';
 
