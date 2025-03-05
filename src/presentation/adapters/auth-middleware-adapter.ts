@@ -16,7 +16,7 @@ export const authMiddlewareAdapter = async (
 
     if (response.statusCode === 200) {
       const { userId } = response.body;
-      (request as any).currentUserId = userId;
+      request.currentUserId = userId;
     } else {
       reply.status(response.statusCode).send(response.body);
     }

@@ -10,7 +10,6 @@ export class FetchUsersController implements Controller {
       const response = await this.findUsersUseCase.execute();
       return ok({ users: response });
     } catch (error) {
-      console.log(error);
       return serverError();
     }
   }
