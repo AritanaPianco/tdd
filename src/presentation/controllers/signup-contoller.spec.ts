@@ -25,11 +25,11 @@ const makeAddUserUseCaseStub = (): AddUser => {
   return new AddUserUseCaseStub();
 };
 
-interface SutTypes {
+type SutTypes = {
   sut: SignUpController;
   emailValidatorStub: Validator;
   addUserUseCaseStub: AddUser;
-}
+};
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub();

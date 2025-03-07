@@ -29,11 +29,11 @@ const makeHttpRequest = (): HttpRequest => ({
   },
 });
 
-interface SutTypes {
+type SutTypes = {
   sut: LoginController;
   authUseCaseStub: Auth;
   emailValidatorStub: Validator;
-}
+};
 
 const makeSut = (): SutTypes => {
   const authUseCaseStub = makeAuthUseCase();

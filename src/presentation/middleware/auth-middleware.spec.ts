@@ -18,10 +18,10 @@ const makeLoadUserByToken = (): LoadUserByToken => {
   return new LoadUserByTokenUseCaseStub();
 };
 
-interface SutTypes {
+type SutTypes = {
   sut: AuthMiddleware;
   loadUserByTokenStub: LoadUserByToken;
-}
+};
 
 const makeSut = (): SutTypes => {
   const loadUserByTokenStub = makeLoadUserByToken();

@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export interface UserProps {
+export type UserProps = {
   name: string;
   email: string;
   password: string;
-}
+};
 
 export class User {
   constructor(

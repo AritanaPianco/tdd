@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export interface UserTokenProps {
+export type UserTokenProps = {
   userId: string;
   token: string;
-}
+};
 
 export class UserToken {
   constructor(
