@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx watch src/infra/http/server.ts",
-    "start": "node dist/infra/http/server.js",
+    "start": "node dist/infra/http/server.cjs",
     "lint": "biome check ./src",
     "lint:fix": "biome check ./src --fix",
     "prepare": "husky",
@@ -55,6 +55,7 @@
     "fastify": "^5.2.1",
     "jsonwebtoken": "^9.0.2",
     "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0",
     "uuid": "^11.1.0",
     "validator": "^13.12.0"
   }

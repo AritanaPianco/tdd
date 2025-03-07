@@ -1,4 +1,5 @@
 import type { Auth } from '@/domain/usecases/auth-usecase';
+import { inject, injectable } from 'tsyringe';
 import { InvalidParamError, MissingParamError } from '../errors';
 import { badRequest, ok, serverError, unauthorizedError } from '../helpers';
 import type {
@@ -8,10 +9,13 @@ import type {
   Validator,
 } from '../protocols/';
 
+@injectable()
 export class LoginController implements Controller {
   constructor(
-    private readonly authUseCase: Auth,
-    private readonly emailValidator: Validator,
+    @inject('AuthenticationUseCase')
+    private authUseCase: Auth,
+    @inject('EmailValidator')
+    private emailValidator: Validator,
   ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {

@@ -1,10 +1,15 @@
 import type { LoadUserByToken } from '@/domain/usecases/load-user-by-token';
+import { inject, injectable } from 'tsyringe';
 import { AccessDeniedError } from '../errors';
 import { forbiddenError, ok } from '../helpers';
 import type { HttpRequest, HttpResponse, Middleware } from '../protocols';
 
+@injectable()
 export class AuthMiddleware implements Middleware {
-  constructor(private readonly loadUserByToken: LoadUserByToken) {}
+  constructor(
+    @inject('LoadUserByTokenUseCase')
+    private loadUserByToken: LoadUserByToken,
+  ) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     if (!httpRequest.headers['authorization']) {

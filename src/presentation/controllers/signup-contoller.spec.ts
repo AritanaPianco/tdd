@@ -52,7 +52,6 @@ const makeHttpRequest = () => ({
 
 describe('SignUpController', () => {
   test('should return 400 if no name is provided', async () => {
-    // sut => system under test => nosso sistema é SignUpController
     const { sut } = makeSut();
     const httpRequest = {
       body: {

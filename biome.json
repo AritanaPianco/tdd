@@ -1,55 +1,54 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": {
-		"enabled": false,
-		"clientKind": "git",
-		"useIgnoreFile": false
-	},
-	"files": {
-		"ignoreUnknown": false,
-		"include": ["src/**/*.ts"],
-		"ignore": ["node_modules"]
-	},
-	"formatter": {
-		"enabled": true,
-		"indentStyle": "space",
-		"formatWithErrors": false,
-		"indentWidth": 2
-	},
-	"organizeImports": {
-		"enabled": true
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-		  "recommended": true,
-		  "complexity": {
-			"noStaticOnlyClass": "off",
-			"useLiteralKeys": "off",
-			"noThisInStatic": "off",
-			"noForEach": "off"
-		  },
-		  "a11y": {
-			"noSvgWithoutTitle": "off"
-		  },
-		  "suspicious": {
-			"noExplicitAny": "off",
-			"noArrayIndexKey": "off"
-		  },
-		  "correctness": {
-			"useExhaustiveDependencies": "off"
-		  },
-		  "style": {
-			"noNonNullAssertion": "off"
-		  }
-		}
-	  },
-	  
-	
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "single"
-		}
-
-	}
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "include": ["src/**/*.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "formatWithErrors": false,
+    "indentWidth": 2
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noStaticOnlyClass": "off",
+        "useLiteralKeys": "off",
+        "noThisInStatic": "off",
+        "noForEach": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  }
 }

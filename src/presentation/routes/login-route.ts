@@ -1,16 +1,6 @@
 import type { FastifyInstance } from 'fastify';
-import { makeLoginControllerFactory } from '../factories/login-controller/login-controller-factory';
-
-const schema = {
-  body: {
-    type: 'object',
-    properties: {
-      email: { type: 'string' },
-      password: { type: 'string' },
-    },
-    required: ['email', 'password'],
-  },
-};
+import { container } from 'tsyringe';
+import { LoginController } from '../controllers/login-controller';
 
 export async function loginRoute(app: FastifyInstance) {
   app.post('/login', async (request, reply) => {
@@ -18,7 +8,7 @@ export async function loginRoute(app: FastifyInstance) {
       email: string;
       password: string;
     };
-    const loginController = makeLoginControllerFactory();
+    const loginController = container.resolve(LoginController);
     const customRequest = {
       body: {
         email,

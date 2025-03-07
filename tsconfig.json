@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,                        
     "target": "ES2023",
     "module": "CommonJS",                                
     "lib": ["ES2023"],                                                                      
@@ -10,8 +12,7 @@
     },                                    
     "types": [
        "vitest/globals"
-    ],                                     
-   
+    ],       
     "outDir": "./dist",                                  
     "esModuleInterop": true,                           
     "forceConsistentCasingInFileNames": true,          

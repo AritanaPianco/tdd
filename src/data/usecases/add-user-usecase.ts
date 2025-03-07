@@ -6,13 +6,19 @@ import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { AddUser } from '@/domain/usecases/add-user-usecase';
 import { conflictError } from '@/presentation/helpers';
+import { inject, injectable } from 'tsyringe';
 
+@injectable()
 export class AddUserUseCase implements AddUser {
   constructor(
-    private readonly usersRepository: UserRepository,
-    private readonly hash: Hash,
-    private readonly encrypter: Encrypter,
-    private readonly usersTokenRepository: UserTokenRepository,
+    @inject('UsersRepository')
+    private usersRepository: UserRepository,
+    @inject('BcryptAdapter')
+    private hash: Hash,
+    @inject('JwtAdapter')
+    private encrypter: Encrypter,
+    @inject('UsersTokenRepository')
+    private usersTokenRepository: UserTokenRepository,
   ) {}
 
   async execute(user: UserProps): Promise<string | any> {

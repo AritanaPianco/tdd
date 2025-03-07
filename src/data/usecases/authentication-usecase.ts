@@ -4,13 +4,19 @@ import type { UserRepository } from '@/domain/repositories/user-repository';
 import type { UserTokenRepository } from '@/domain/repositories/user-token-repository';
 import type { Auth, AuthModel } from '@/domain/usecases/auth-usecase';
 import { MissingParamError } from '@/presentation/errors';
+import { inject, injectable } from 'tsyringe';
 
+@injectable()
 export class AuthenticationUseCase implements Auth {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly hashComparer: HashComparer,
-    private readonly encrypter: Encrypter,
-    private readonly userTokenRepository: UserTokenRepository,
+    @inject('UsersRepository')
+    private userRepository: UserRepository,
+    @inject('BcryptAdapter')
+    private hashComparer: HashComparer,
+    @inject('JwtAdapter')
+    private encrypter: Encrypter,
+    @inject('UsersTokenRepository')
+    private userTokenRepository: UserTokenRepository,
   ) {}
 
   async execute(authModel: AuthModel): Promise<string | null> {

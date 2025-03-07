@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import '../container/';
 import { FetchUsersRoute } from '@/presentation/routes/fetch-users-route';
 import { loginRoute } from '@/presentation/routes/login-route';
 import { SignUpRoute } from '@/presentation/routes/signup-route';
